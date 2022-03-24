@@ -1,29 +1,26 @@
 name: build
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
     name: build
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ endsWith(matrix.ruby, 'head') || matrix.ruby == 'debug' || matrix.experimental }}
+    continue-on-error: false
     env:
       BUNDLE_JOBS: 4
       BUNDLE_RETRY: 3
+      
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        bundler: ["2.1.4"]
-        ruby: [
-          2.7,
-          3.0
-        ]
-        gemfile: [
-          "gemfiles/Gemfile-jekyll-github",
-          "gemfiles/Gemfile-jekyll.4.2.x",
-        ]
-        experimental: [false]
+        pnpm-version: [ 6.32.3 ]
+        node-version: [ 16 ]
+        bundler: [ "2.1.4" ]
+        ruby: [ 2.7, 3.0 ]
+        gemfile: [ "gemfiles/Gemfile-jekyll-github", "gemfiles/Gemfile-jekyll.4.2.x" ]
+        experimental: [ false ]
 
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: '15'
+          node-version: 16
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -49,9 +46,9 @@ jobs:
           bundle _${{ matrix.bundler }}_ config --global gemfile ${{ matrix.gemfile }}
           bundle _${{ matrix.bundler }}_ install # --jobs 4 --retry 3
 
-      - uses: pnpm/action-setup@v1.2.1
+      - uses: pnpm/action-setup@latest
         with:
-          version: 5.13.6
+          version: ${{ matrix.pnpm-version }}
           run_install: |
             - recursive: false
             - cwd: 'docs'
