@@ -46,7 +46,7 @@ jobs:
           bundle _${{ matrix.bundler }}_ config --global gemfile ${{ matrix.gemfile }}
           bundle _${{ matrix.bundler }}_ install # --jobs 4 --retry 3
 
-      - uses: pnpm/action-setup@latest
+      - uses: pnpm/action-setup@master
         with:
           version: ${{ matrix.pnpm-version }}
           run_install: |
